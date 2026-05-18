@@ -3,14 +3,15 @@ package com.sakurafuld.hyperdaimc.content.crafting.sigill;
 import com.sakurafuld.hyperdaimc.HyperCommonConfig;
 import com.sakurafuld.hyperdaimc.content.HyperBlocks;
 import com.sakurafuld.hyperdaimc.content.HyperEntities;
+import com.sakurafuld.hyperdaimc.content.HyperSounds;
 import com.sakurafuld.hyperdaimc.content.hyper.fumetsu.FumetsuEntity;
-import com.sakurafuld.hyperdaimc.content.hyper.fumetsu.FumetsuHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,33 +38,6 @@ public class SigilItem extends Item {
         super(pProperties.rarity(Rarity.UNCOMMON).stacksTo(1).fireResistant());
     }
 
-    @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
-        return itemStack.copy();
-    }
-
-    @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(Component.translatable("tooltip.hyperdaimc.god_sigil").withStyle(ChatFormatting.GRAY));
-    }
-
-    @Override
-    public InteractionResult useOn(UseOnContext pContext) {
-        if (HyperCommonConfig.FUMETSU_SUMMON.get() && pContext.getPlayer() != null && pContext.getPlayer().isShiftKeyDown()) {
-
-            if (checkAndSpawn(pContext.getLevel(), pContext.getClickedPos(), getOrCreatePattern0()) || checkAndSpawn(pContext.getLevel(), pContext.getClickedPos(), getOrCreatePattern1()))
-                ;
-
-            return InteractionResult.sidedSuccess(pContext.getLevel().isClientSide());
-        }
-        return super.useOn(pContext);
-    }
-
     public static boolean checkAndSpawn(Level level, BlockPos pos, BlockPattern pattern) {
         BlockPattern.BlockPatternMatch match = pattern.find(level, pos);
         if (match != null) {
@@ -76,20 +50,20 @@ public class SigilItem extends Item {
                     }
                 }
 
-                FumetsuHandler.spawn.set(true);
-
                 FumetsuEntity fumetsu = HyperEntities.FUMETSU.get().create(level);
+                fumetsu.setMovable(true);
                 BlockPos center = match.getBlock(1, 2, 0).getPos();
                 fumetsu.moveTo(center.getX() + 0.5, center.getY() + 0.25, center.getZ() + 0.5, match.getForwards().getAxis() == Direction.Axis.X ? 0 : 90, 0);
-                fumetsu.yBodyRot = match.getForwards().getAxis() == Direction.Axis.X ? 0 : 90;
-
-                FumetsuHandler.spawn.set(false);
 
                 for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, fumetsu.getBoundingBox().inflate(50))) {
                     CriteriaTriggers.SUMMONED_ENTITY.trigger(player, fumetsu);
                 }
 
                 level.addFreshEntity(fumetsu);
+
+                fumetsu.setMovable(false);
+
+                level.playSound(null, fumetsu, HyperSounds.DESK_POP.get(), SoundSource.BLOCKS, 1, 1 + level.getRandom().nextFloat() * 0.2f);
 
                 for (int w = 0; w < pattern.getWidth(); ++w) {
                     for (int h = 0; h < pattern.getHeight(); ++h) {
@@ -132,5 +106,32 @@ public class SigilItem extends Item {
         }
 
         return pattern1;
+    }
+
+    @Override
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+        return itemStack.copy();
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        pTooltipComponents.add(Component.translatable("tooltip.hyperdaimc.god_sigil").withStyle(ChatFormatting.GRAY));
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext pContext) {
+        if (HyperCommonConfig.FUMETSU_SUMMON.get() && pContext.getPlayer() != null && pContext.getPlayer().isShiftKeyDown()) {
+
+            if (checkAndSpawn(pContext.getLevel(), pContext.getClickedPos(), getOrCreatePattern0()) || checkAndSpawn(pContext.getLevel(), pContext.getClickedPos(), getOrCreatePattern1()))
+                ;
+
+            return InteractionResult.sidedSuccess(pContext.getLevel().isClientSide());
+        }
+        return super.useOn(pContext);
     }
 }

@@ -1,7 +1,7 @@
 package com.sakurafuld.hyperdaimc.mixin.chronicle;
 
 import com.sakurafuld.hyperdaimc.HyperCommonConfig;
-import com.sakurafuld.hyperdaimc.content.hyper.chronicle.ChronicleHandler;
+import com.sakurafuld.hyperdaimc.content.hyper.chronicle.system.ChronicleHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -17,16 +17,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class PlayerMixin {
     @Inject(method = "blockActionRestricted", at = @At("HEAD"), cancellable = true)
     private void blockActionRestrictedChronicle(Level pLevel, BlockPos pPos, GameType pGameMode, CallbackInfoReturnable<Boolean> cir) {
-        if (HyperCommonConfig.CHRONICLE_INTERACT.get() && ChronicleHandler.isPaused(pLevel, pPos, (Player) ((Object) this))) {
+        Player self = (Player) (Object) this;
+        if (HyperCommonConfig.CHRONICLE_INTERACT.get() && ChronicleHandler.isPaused(pLevel, pPos, self)) {
             cir.setReturnValue(true);
+            if (pLevel.isClientSide() && self.swinging)
+                ChronicleHandler.hitEffect(pPos);
         }
     }
 
     @Inject(method = "mayUseItemAt", at = @At("HEAD"), cancellable = true)
     private void mayUseItemAt(BlockPos pPos, Direction pFacing, ItemStack pStack, CallbackInfoReturnable<Boolean> cir) {
-        Player self = (Player) ((Object) this);
-        if (ChronicleHandler.isPaused(self.level(), pPos, self)) {
+        Player self = (Player) (Object) this;
+        if (ChronicleHandler.isPaused(self.level(), pPos, self))
             cir.setReturnValue(false);
-        }
     }
 }

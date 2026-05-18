@@ -1,7 +1,7 @@
 package com.sakurafuld.hyperdaimc.mixin.fumetsu;
 
-import com.sakurafuld.hyperdaimc.api.content.IFumetsu;
 import com.sakurafuld.hyperdaimc.content.hyper.fumetsu.FumetsuHandler;
+import com.sakurafuld.hyperdaimc.infrastructure.entity.IFumetsu;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
@@ -78,11 +78,11 @@ public abstract class ClientPacketListenerMixin {
 
     @Inject(method = "handleRemoveEntities", at = @At("HEAD"))
     private void handleRemoveEntitiesFumetsu$HEAD(ClientboundRemoveEntitiesPacket pPacket, CallbackInfo ci) {
-        FumetsuHandler.specialRemove.set(true);
+        FumetsuHandler.increaseSpecialRemove();
     }
 
     @Inject(method = "handleRemoveEntities", at = @At("RETURN"))
     private void handleRemoveEntitiesFumetsu$RETURN(ClientboundRemoveEntitiesPacket pPacket, CallbackInfo ci) {
-        FumetsuHandler.specialRemove.set(false);
+        FumetsuHandler.decreaseSpecialRemove();
     }
 }

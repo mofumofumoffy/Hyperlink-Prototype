@@ -23,38 +23,28 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import static com.sakurafuld.hyperdaimc.helper.Deets.identifier;
+import static com.sakurafuld.hyperdaimc.infrastructure.Deets.identifier;
 
 @OnlyIn(Dist.CLIENT)
 public class FumetsuSkullBlockEntityRenderer implements BlockEntityRenderer<FumetsuSkullBlockEntity> {
     public static final ResourceLocation TEXTURE = identifier("textures/block/fumetsu_skull.png");
 
-    private final Object2ObjectOpenHashMap<Block, SkullModel> models;
-    private final SkullModel center;
+    private static Object2ObjectOpenHashMap<Block, SkullModel> models;
+    private static SkullModel center;
 
     public FumetsuSkullBlockEntityRenderer(BlockEntityRendererProvider.Context pContext) {
-        this.models = new Object2ObjectOpenHashMap<>();
+        models = new Object2ObjectOpenHashMap<>();
         SkullModel model;
         model = new SkullModel(create(0, 0).bakeRoot());
-        this.center = model;
-        this.models.put(HyperBlocks.FUMETSU_SKULL.get(), model);
-        this.models.put(HyperBlocks.FUMETSU_WALL_SKULL.get(), model);
+        center = model;
+        models.put(HyperBlocks.FUMETSU_SKULL.get(), model);
+        models.put(HyperBlocks.FUMETSU_WALL_SKULL.get(), model);
         model = new SkullModel(create(0, 16).bakeRoot());
-        this.models.put(HyperBlocks.FUMETSU_RIGHT.get(), model);
-        this.models.put(HyperBlocks.FUMETSU_WALL_RIGHT.get(), model);
+        models.put(HyperBlocks.FUMETSU_RIGHT.get(), model);
+        models.put(HyperBlocks.FUMETSU_WALL_RIGHT.get(), model);
         model = new SkullModel(create(32, 0).bakeRoot());
-        this.models.put(HyperBlocks.FUMETSU_LEFT.get(), model);
-        this.models.put(HyperBlocks.FUMETSU_WALL_LEFT.get(), model);
-    }
-
-    @Override
-    public void render(FumetsuSkullBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
-        BlockState state = pBlockEntity.getBlockState();
-        boolean wall = state.getBlock() instanceof WallSkullBlock;
-        Direction direction = wall ? state.getValue(WallSkullBlock.FACING) : null;
-        float yRot = 22.5f * (wall ? (2f + direction.get2DDataValue()) * 4f : state.getValue(SkullBlock.ROTATION));
-
-        SkullBlockRenderer.renderSkull(direction, yRot, 0, pPoseStack, pBufferSource, pPackedLight, this.models.getOrDefault(pBlockEntity.getBlockState().getBlock(), this.center), RenderType.entityCutoutNoCullZOffset(TEXTURE));
+        models.put(HyperBlocks.FUMETSU_LEFT.get(), model);
+        models.put(HyperBlocks.FUMETSU_WALL_LEFT.get(), model);
     }
 
     public static LayerDefinition create(int x, int y) {
@@ -62,5 +52,19 @@ public class FumetsuSkullBlockEntityRenderer implements BlockEntityRenderer<Fume
         PartDefinition root = mesh.getRoot();
         root.addOrReplaceChild("head", CubeListBuilder.create().texOffs(x, y).addBox(-4, -8, -4, 8, 8, 8), PartPose.ZERO);
         return LayerDefinition.create(mesh, 64, 32);
+    }
+
+    @Override
+    public void render(FumetsuSkullBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
+        BlockState state = pBlockEntity.getBlockState();
+        render(pPoseStack, pBufferSource, pPackedLight, state);
+    }
+
+    public static void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, BlockState state) {
+        boolean wall = state.getBlock() instanceof WallSkullBlock;
+        Direction direction = wall ? state.getValue(WallSkullBlock.FACING) : null;
+        float yRot = 22.5f * (wall ? (2f + direction.get2DDataValue()) * 4f : state.getValue(SkullBlock.ROTATION));
+
+        SkullBlockRenderer.renderSkull(direction, yRot, 0, pPoseStack, pBufferSource, pPackedLight, models.getOrDefault(state.getBlock(), center), RenderType.entityCutoutNoCullZOffset(TEXTURE));
     }
 }

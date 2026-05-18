@@ -25,14 +25,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static com.sakurafuld.hyperdaimc.helper.Deets.identifier;
+import static com.sakurafuld.hyperdaimc.infrastructure.Deets.identifier;
 
 public class DeskShapedRecipeBuilder implements RecipeBuilder {
-    private boolean minecraft = false;
     private final ItemLike result;
     private final int count;
     private final List<String> pattern = Lists.newArrayList();
     private final Map<Character, Ingredient> key = Maps.newLinkedHashMap();
+    private boolean minecraft = false;
 
     public DeskShapedRecipeBuilder(ItemLike result, int count) {
         this.result = result;
@@ -102,7 +102,7 @@ public class DeskShapedRecipeBuilder implements RecipeBuilder {
     @Override
     public void save(Consumer<FinishedRecipe> pFinishedRecipeConsumer, ResourceLocation pRecipeId) {
         this.ensureValid(pRecipeId);
-        pFinishedRecipeConsumer.accept(new Result(pRecipeId));
+        pFinishedRecipeConsumer.accept(new Finisher(pRecipeId));
     }
 
     public void saveMaterial(Consumer<FinishedRecipe> finisher) {
@@ -139,13 +139,14 @@ public class DeskShapedRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    public class Result implements FinishedRecipe {
+    class Finisher implements FinishedRecipe {
         private final ResourceLocation id;
 
-        public Result(ResourceLocation id) {
+        Finisher(ResourceLocation id) {
             this.id = id;
         }
 
+        @Override
         public void serializeRecipeData(JsonObject pJson) {
             if (DeskShapedRecipeBuilder.this.minecraft) {
                 pJson.addProperty("minecraft", true);

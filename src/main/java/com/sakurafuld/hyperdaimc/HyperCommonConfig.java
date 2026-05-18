@@ -1,5 +1,7 @@
 package com.sakurafuld.hyperdaimc;
 
+import com.sakurafuld.hyperdaimc.content.hyper.novel.system.NovelHandler;
+import com.sakurafuld.hyperdaimc.content.hyper.paradox.system.ParadoxHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -18,7 +20,9 @@ public class HyperCommonConfig {
     public static final ForgeConfigSpec.BooleanValue NOVEL_VULNERABILIZATION;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> NOVEL_IGNORE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> NOVEL_SPECIAL;
+    public static final ForgeConfigSpec.DoubleValue NOVEL_REACH;
     public static final ForgeConfigSpec.BooleanValue NOVEL_INVERT_SHIFT;
+    public static final ForgeConfigSpec.EnumValue<NovelHandler.RenderingLevel> NOVEL_RENDERING_LEVEL;
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_CHRONICLE;
     public static final ForgeConfigSpec.BooleanValue CHRONICLE_VULNERABILIZATION;
@@ -26,11 +30,18 @@ public class HyperCommonConfig {
     public static final ForgeConfigSpec.BooleanValue CHRONICLE_OWNER;
     public static final ForgeConfigSpec.BooleanValue CHRONICLE_INTERACT;
     public static final ForgeConfigSpec.IntValue CHRONICLE_SIZE;
+    public static final ForgeConfigSpec.BooleanValue CHRONICLE_SHOW_PROTECTION;
     public static final ForgeConfigSpec.BooleanValue CHRONICLE_INVERT_SHIFT;
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_PARADOX;
     public static final ForgeConfigSpec.BooleanValue PARADOX_HIT_FLUID;
+    public static final ForgeConfigSpec.IntValue PARADOX_DESTROY_AT_ONCE;
+    public static final ForgeConfigSpec.IntValue PARADOX_DESTROY_PER_TICK;
+    public static final ForgeConfigSpec.BooleanValue PARADOX_NO_CHAIN_PARTICLES;
+    public static final ForgeConfigSpec.IntValue PARADOX_FADE;
     public static final ForgeConfigSpec.BooleanValue PARADOX_INVERT_SHIFT;
+    public static final ForgeConfigSpec.EnumValue<ParadoxHandler.RenderingLevel> PARADOX_RENDERING_LEVEL;
+
 
     public static final ForgeConfigSpec.BooleanValue ENABLE_VRX;
     public static final ForgeConfigSpec.BooleanValue VRX_VULNERABILIZATION;
@@ -38,9 +49,11 @@ public class HyperCommonConfig {
     public static final ForgeConfigSpec.BooleanValue VRX_PLAYER;
     public static final ForgeConfigSpec.BooleanValue VRX_JEI;
     public static final ForgeConfigSpec.BooleanValue VRX_SEAL_HYPERLINK;
+    public static final ForgeConfigSpec.ConfigValue<String> VRX_EMC_VALUE;
 
     public static final ForgeConfigSpec.BooleanValue FUMETSU_RECIPE;
     public static final ForgeConfigSpec.BooleanValue FUMETSU_SUMMON;
+    public static final ForgeConfigSpec.BooleanValue FUMETSU_LOGOUT;
     public static final ForgeConfigSpec.IntValue FUMETSU_HEALTH;
     public static final ForgeConfigSpec.IntValue FUMETSU_RANGE;
     public static final ForgeConfigSpec.BooleanValue FUMETSU_UNDERGROUND;
@@ -91,15 +104,23 @@ public class HyperCommonConfig {
                         .define("Novel vulnerabilization", false);
                 NOVEL_IGNORE = builder
                         .comment("Specific entities that ignore Novelize")
-                        .defineList("Ignore entities", List.of("minecraft:item", "minecraft:experience_orb", "hyperdaimc:fumetsu_skull", "hyperdaimc:fumetsu_storm", "hyperdaimc:fumetsu_storm_skull"),
+                        .defineList("Ignored entities", List.of("minecraft:item", "minecraft:experience_orb", "hyperdaimc:fumetsu_skull", "hyperdaimc:fumetsu_storm", "hyperdaimc:fumetsu_storm_skull"),
                                 object -> object instanceof String string && ResourceLocation.isValidResourceLocation(string));
                 NOVEL_SPECIAL = builder
                         .comment("Specific entities not interrupted in the death process by Novel ( e.g. entities with a death animation )")
-                        .defineList("Special entities", List.of("minecraft:ender_dragon", "draconicevolution:draconic_guardian", "cataclysm:ender_guardian", "cataclysm:netherite_monstrosity", "cataclysm:ignis", "cataclysm:the_harbinger", "cataclysm:the_prowler", "cataclysm:coralssus", "cataclysm:amethyst_crab", "cataclysm:ancient_remnant", "cataclysm:wadjet", "cataclysm:maledictus", "cataclysm:aptrgangr"),
+                        .defineList("Special entities", List.of("minecraft:ender_dragon", "draconicevolution:draconic_guardian", "cataclysm:ender_guardian", "cataclysm:netherite_monstrosity", "cataclysm:ignis", "cataclysm:the_harbinger", "cataclysm:the_prowler", "cataclysm:coralssus", "cataclysm:amethyst_crab", "cataclysm:ancient_remnant", "cataclysm:wadjet", "cataclysm:maledictus", "cataclysm:aptrgangr", "iceandfire:ice_dragon", "iceandfire:fire_dragon", "iceandfire:lightning_dragon", "fantasy_ending:ultimate_order_manager"),
                                 object -> object instanceof String string && ResourceLocation.isValidResourceLocation(string));
+                NOVEL_REACH = builder
+                        .comment("Attack range of Novel",
+                                "Default: 6")
+                        .defineInRange("Novel reach", 6, 0, Double.POSITIVE_INFINITY);
                 NOVEL_INVERT_SHIFT = builder
                         .comment("Default: false ( = Shift to target a single entity)")
                         .define("Invert Novel control", false);
+                NOVEL_RENDERING_LEVEL = builder
+                        .comment("Level of effect rendering",
+                                "Default: ALL")
+                        .defineEnum("Rendering level", NovelHandler.RenderingLevel.ALL);
             }
             builder.pop();
 
@@ -122,9 +143,13 @@ public class HyperCommonConfig {
                                 "Default: false")
                         .define("Pause owner", false);
                 CHRONICLE_INTERACT = builder
-                        .comment("Cannot interact with blocks in Chronicle ( Like in Adventure Mode )",
+                        .comment("Cannot interact with blocks in Chronicle ( Like in Adventure mode )",
                                 "Default: false")
                         .define("Pause interaction", false);
+                CHRONICLE_SHOW_PROTECTION = builder
+                        .comment("When targeting or hitting a paused block, show effects",
+                                "Default: true")
+                        .define("Show protection", true);
                 CHRONICLE_SIZE = builder
                         .comment("Max selection size of Chronicle",
                                 "Default: 16384")
@@ -145,9 +170,29 @@ public class HyperCommonConfig {
                         .comment("Paradox may Perfect Knockout liquid blocks",
                                 "Default: true")
                         .define("Fluid Paradox", true);
+                PARADOX_DESTROY_AT_ONCE = builder
+                        .comment("Number of destroying at once when chaining",
+                                "Default: 256")
+                        .defineInRange("Destroy at once", 256, 1, Integer.MAX_VALUE);
+                PARADOX_DESTROY_PER_TICK = builder
+                        .comment("Destroy per ticks when chaining",
+                                "Default: 4")
+                        .defineInRange("Destroy per ticks", 4, 1, Integer.MAX_VALUE);
+                PARADOX_FADE = builder
+                        .comment("Tick time until chains disappear",
+                                "Default: 200")
+                        .defineInRange("Fade duration", 200, 1, Integer.MAX_VALUE);
                 PARADOX_INVERT_SHIFT = builder
                         .comment("Default: false ( = Shift to no continuous target blocks)")
                         .define("Invert Paradox control", false);
+                PARADOX_RENDERING_LEVEL = builder
+                        .comment("Level of effect rendering when destroyed",
+                                "Default: TERRAIN")
+                        .defineEnum("Rendering level", ParadoxHandler.RenderingLevel.TERRAIN);
+                PARADOX_NO_CHAIN_PARTICLES = builder
+                        .comment("Disable particles when chain destroyed",
+                                "Default: false")
+                        .define("Disable chaining particles", false);
             }
             builder.pop();
 
@@ -177,6 +222,10 @@ public class HyperCommonConfig {
                         .comment("Unable to set Hyperlink items in VRX",
                                 "Default: true")
                         .define("Seal Hyperlink", true);
+                VRX_EMC_VALUE = builder
+                        .comment("When ProjectE is loaded, providing unit of emc",
+                                "Default: 9223372036854775807")
+                        .define("Emc value", "9223372036854775807", o -> o instanceof String s && s.chars().allMatch(Character::isDigit));
             }
             builder.pop();
 
@@ -190,6 +239,10 @@ public class HyperCommonConfig {
                         .comment("Enable Fumetsu summoning by assembling blocks",
                                 "Default: true")
                         .define("Enable summoning", true);
+                FUMETSU_LOGOUT = builder
+                        .comment("Enable Fumetsu to log out",
+                                "Default: true")
+                        .define("Enable logging out", true);
                 FUMETSU_HEALTH = builder
                         .comment("Default: 20")
                         .defineInRange("Max health", 20, 20, Integer.MAX_VALUE);
