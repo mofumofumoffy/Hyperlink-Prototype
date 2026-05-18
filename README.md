@@ -1,120 +1,13 @@
-# Hyperlink
-MinecraftForge
+This project is a lightweight fork/derivative of Hyperlink, which is licensed under the MIT License.
 
-ハイパー桁外れなアイテムとボスを追加するMod
+This version removes all mod-specific compatibility code, including direct mixins, inheritance, and references to third-party closed-source or ARR mods. It only retains the general animations and functions from the original MIT-licensed codebase.
 
-# ↓Config(すべて1.20.1でのデフォルトの値、v3.0-preでの情報も含む)
+Original copyright notices and the MIT License are preserved.
 
-- Config warning = true
-  - バージョン2.0でコンフィグファイルが統合されたことをログイン時に警告するか
+---
 
-## Muteki
+本プロジェクトは、MIT Licenseで公開されている Hyperlink を基にした軽量派生版です。
 
-- Enable Muteki = true
-  - ムテキスターを機能させるのか
-- Hyper Muteki = false
-  - ムテキスターがノベルカリバーの攻撃を完全に弾くか
-- Muteki command = true
-  - ムテキスターがコマンドの対象にならないようにするのか
+この版では、特定mod向けの互換処理、直接mixin、直接継承、クローズドソースまたはARRライセンスの第三者modへの参照を削除し、汎用的なアニメーションや機能のみを残しています。
 
-## Novel
-
-- Enable Novel = true
-  - ノベルカリバーを機能させるのか
-- Novel vulnerabilization = false
-  - ノベルカリバーのプログラム的脆弱性を有効にするか
-- Ignore entities = [ "minecraft:item", "minecraft:experience_orb", "hyperdaimc:fumetsu_skull", "hyperdaimc:fumetsu_storm", "hyperdaimc:fumetsu_storm_skull" ]
-  - ノベルカリバーを無視するエンティティのリスト
-- Special entities = [ "minecraft:ender_dragon", "draconicevolution:draconic_guardian", "cataclysm:ender_guardian", "cataclysm:netherite_monstrosity", "cataclysm:ignis", "cataclysm:the_harbinger", "cataclysm:the_prowler", "cataclysm:coralssus", "cataclysm:amethyst_crab", "cataclysm:ancient_remnant", "cataclysm:wadjet", "cataclysm:maledictus", "cataclysm:aptrgangr", "iceandfire:ice_dragon", "iceandfire:fire_dragon", "iceandfire:lightning_dragon", "fantasy_ending:ultimate_order_manager" ]
-  - 死亡処理を中断しないエンティティのリスト(撃破演出を持っているなど)
-- Novel reach = 6.0
-  - 殴れる最大リーチ
-- Invert Novel control = false
-  - スニーク時の操作挙動を反転させるか(デフォルトではスニークすると単体攻撃)
-- Rendering level = ALL
-  - パーティクルなどをどのレベルまで表示するか(NONEで全て無効化、UNIQUEで小っちゃいヤツだけ無効化)
-
-## Chronicle
-
-- Enable Chronicle = true
-  - クロニクロックを機能させるのか
-- Chronicle vulnerabilization = false
-  - クロニクロックのプログラム的脆弱性を有効にするか
-- Hyper Chronicle = false
-  - クロニクロックがピックドクスの破壊を完全に弾くか
-- Pause owner = false
-  - 保護した本人が影響を受けるか
-- Pause interaction = false
-  - アドベンチャーモードのようにブロックへのインタラクトを防ぐか
-- Show protection = true
-  - 保護領域を殴った時などに演出を出すか
-- Selection size = 16384
-  - 一度に設定できる保護の最大範囲
-- Invert Chronicle control = false
-  - スニーク時の操作挙動を反転させるか(デフォルトではスニークすると面でオフセットされた座標を選ぶ)
-
-## Paradox
-
-- Enable Paradox = true
-  - ピックドクスを機能させるのか
-- Fluid Paradox = true
-  - 液体を破壊できるか
-- Destroy at once = 256
-  - チェイン採掘時、一度に破壊する数
-- Destroy per ticks = 4
-  - チェイン採掘時、破壊を何tickごとに行うか
-- Fade duration = 200
-  - ピックドクスから手を放してチェインが消えるまでのtick時間
-- Invert Paradox control = false
-  - スニーク時の操作挙動を反転させるか(デフォルトではスニークすると1ブロックずつ破壊)
-- Disable chaining particles = false
-  - チェイン採掘時のパーティクルを完全に無効化するか
-- Rendering level = TERRAIN
-  - パーティクルをどのレベルまで表示するか(NONEで全て無効化、ALLで小っちゃいヤツを有効化)
-
-## VRX
-
-- Enable VRX = true
-  - V.R.X.を機能させるのか
-- VRX vulnerabilization = false
-  - V.R.X.のプログラム的脆弱性を有効にするか
-- Keep VRX = true
-  - 自身を対象としたV.R.X.が死亡後も保たれるか
-- Create for others = false
-  - 他のプレイヤーへV.R.X.を設定できるか
-- Just Enough VRX = true
-  - V.R.X.のセットアップをJEIから行えるか
-- Seal Hyperlink = true
-  - V.R.X.にHyperlinkのアイテムを設定できなくするか
-- Emc value = "9223372036854775807"
-  - EMCの供給速度(ProjectEが導入されている場合のみ)
-
-## Fumetsu
-
-- Enable recipes = true
-  - ケミカルMAXとフメツドクロの特殊な醸造レシピを有効化するのか
-- Enable summoning = true
-  - ブロックを組み立ててフメツウザーを召喚できるか
-- Enable logging out = true
-  - フメツウザーがログアウトするのか
-- Max health = 20
-  - 最大体力
-- Search range = 128
-  - ターゲットを探す範囲
-- Search underground = false
-  - プレイヤー以外のMobでも地下にいる相手をターゲットするのか
-
-## Materializer
-
-- Process time = 6000
-  - 加工時間
-- Stack same ingredients = false
-  - レシピに同じ材料がある時それをスタックさせるのか(デフォルトでは全ての材料は一つづつ抽出される)
-- Materializer recipe types = [ "minecraft:crafting", "minecraft:smelting", "minecraft:blasting", "minecraft:smoking", "minecraft:campfire_cooking", "minecraft:smithing", "hyperdaimc:desk", "avaritia:crafting_table_recipe", "avaritia:compressor_recipe", "avaritia:extreme_smithing_recipe" ]
-  - Z-MAX マテリアライザーが材料を遡るレシピタイプのリスト
-- Materializer fuels = [ "hyperdaimc:god_sigil=64" ]
-  - Z-MAX マテリアライザーの燃料として使えるアイテムとその使用回数のリスト
-- Recipe blacklist = [ "hyperdaimc:nether_star", "hyperdaimc:desk", "hyperdaimc:game_orb", "hyperdaimc:hyper/muteki", "hyperdaimc:hyper/novel", "hyperdaimc:hyper/chronicle", "hyperdaimc:hyper/paradox", "hyperdaimc:hyper/vrx" ]
-  - 材料を遡る時に無視する個別のレシピのリスト
-- Tag blacklist = [ "forge:ingots", "forge:gems", "forge:storage_blocks", "forge:nuggets", "hyperdaimc:essences", "hyperdaimc:cores", "hyperdaimc:gists", "tconstruct:anvil_metal" ]
-  - 材料を遡る時に無視するアイテムタグのリスト
+元プロジェクトの著作権表示およびMIT License本文は維持しています。
